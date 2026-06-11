@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Logo } from "./Logo";
+import { LogoAvatar } from "./LogoAvatar";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -20,7 +20,7 @@ export function Header() {
     <header className="glass-strong sticky top-0 z-40 border-x-0 border-t-0">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5 text-lg font-bold text-white">
-          <Logo size={36} className="animate-float-soft shrink-0" />
+          <LogoAvatar size={40} className="shrink-0" />
           <span>
             Tone<span className="text-gradient-live">Converter</span>
           </span>
