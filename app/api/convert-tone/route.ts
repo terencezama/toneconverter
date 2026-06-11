@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
+import { corsJson, corsPreflight } from "@/lib/cors";
 import { DEFAULT_PROVIDER_ID, getProvider } from "@/lib/providers";
 import type { ConvertParams } from "@/lib/providers/types";
 import { MAX_CHARS, TONES } from "@/lib/tones";
 
 const VALID_TONES = new Set<string>(TONES.map((t) => t.id));
 const VALID_LENGTHS = new Set(["normal", "shorter", "longer"]);
+
+export function OPTIONS() {
+  return corsPreflight();
+}
 
 export async function POST(req: Request) {
   let body: {
@@ -16,15 +20,15 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    return corsJson({ error: "Invalid JSON body." }, { status: 400 });
   }
 
   const text = typeof body.text === "string" ? body.text.trim() : "";
   if (!text) {
-    return NextResponse.json({ error: "Text is required." }, { status: 400 });
+    return corsJson({ error: "Text is required." }, { status: 400 });
   }
   if (text.length > MAX_CHARS) {
-    return NextResponse.json(
+    return corsJson(
       { error: `Text must be ${MAX_CHARS} characters or fewer.` },
       { status: 400 }
     );
@@ -43,13 +47,13 @@ export async function POST(req: Request) {
 
   const provider = getProvider(providerId);
   if (!provider) {
-    return NextResponse.json(
+    return corsJson(
       { error: `Unknown provider: ${providerId}` },
       { status: 400 }
     );
   }
   if (!provider.isConfigured()) {
-    return NextResponse.json(
+    return corsJson(
       { error: `${provider.label} is not configured on this server.` },
       { status: 400 }
     );
@@ -57,11 +61,11 @@ export async function POST(req: Request) {
 
   try {
     const result = await provider.convert({ text, tone, length });
-    return NextResponse.json({ result });
+    return corsJson({ result });
   } catch (err) {
     console.error("convert-tone failed:", err);
     const message =
       err instanceof Error ? err.message : "Conversion failed. Please try again.";
-    return NextResponse.json({ error: message }, { status: 502 });
+    return corsJson({ error: message }, { status: 502 });
   }
 }

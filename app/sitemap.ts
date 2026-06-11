@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/site";
 import { USE_CASES } from "@/lib/use-cases";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ["", "/use-cases", "/faq", "/pricing"].map((path) => ({
+  const staticPages = ["", "/originality-checker", "/use-cases", "/faq", "/pricing"].map((path) => ({
     url: `${SITE_URL}${path}`,
     changeFrequency: "weekly" as const,
     priority: path === "" ? 1 : 0.7,

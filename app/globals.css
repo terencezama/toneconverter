@@ -1,8 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --background: #07060f;
+  --foreground: #f4f4f5;
+
+  /* Brand gradient (emotion journey: hot -> violet -> calm) */
+  --brand-hot: #fb5e7a;
+  --brand-violet: #8b5cf6;
+  --brand-indigo: #6366f1;
+  --brand-calm: #2dd4bf;
+
+  /* Live emotion accents — updated by EmotionProvider */
+  --emotion-a: #6366f1;
+  --emotion-b: #8b5cf6;
+  --emotion-c: #2dd4bf;
 }
 
 @theme inline {
@@ -15,4 +26,171 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--emotion-b) 45%, transparent);
+}
+
+/* ---------- Glass surfaces ---------- */
+.glass {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.glass-strong {
+  background: rgba(13, 12, 28, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--emotion-b) 65%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--emotion-b) 16%, transparent),
+    0 0 42px -8px color-mix(in srgb, var(--emotion-a) 35%, transparent);
+}
+
+/* ---------- Gradient text & buttons ---------- */
+.text-gradient {
+  background: linear-gradient(
+    100deg,
+    var(--brand-hot),
+    var(--brand-violet) 45%,
+    var(--brand-calm)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-live {
+  background: linear-gradient(
+    100deg,
+    var(--emotion-a),
+    var(--emotion-b) 50%,
+    var(--emotion-c)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn-gradient {
+  background: linear-gradient(
+    120deg,
+    var(--emotion-a),
+    var(--emotion-b) 55%,
+    var(--emotion-c)
+  );
+  background-size: 180% 180%;
+  animation: gradient-drift 6s ease infinite;
+  color: white;
+  transition: filter 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 8px 30px -10px color-mix(in srgb, var(--emotion-b) 60%, transparent);
+}
+
+.btn-gradient:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.btn-gradient:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- CSS aurora fallback (no WebGL / extension popup) ---------- */
+.aurora-fallback {
+  background: radial-gradient(
+      ellipse 90% 70% at 20% 25%,
+      color-mix(in srgb, var(--emotion-a) 38%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 80% 60% at 80% 35%,
+      color-mix(in srgb, var(--emotion-c) 32%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 100% 80% at 50% 100%,
+      color-mix(in srgb, var(--emotion-b) 28%, transparent),
+      transparent 65%
+    ),
+    var(--background);
+  background-size: 140% 140%;
+  animation: gradient-drift 22s ease-in-out infinite;
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes gradient-drift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-float-soft {
+  animation: float-soft 5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes convert-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--emotion-c) 25%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--emotion-c) 35%, transparent);
+  }
+}
+
+.animate-convert-pulse {
+  animation: convert-pulse 1.4s ease-in-out infinite;
+}
+
+/* ---------- Scrollbar ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.35) transparent;
 }

@@ -32,10 +32,10 @@ export default function FaqPage() {
   return (
     <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <FaqJsonLd />
-      <h1 className="text-center text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl">
+      <h1 className="text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
         Frequently Asked Questions
       </h1>
-      <p className="mt-4 text-center text-lg text-zinc-600">
+      <p className="mt-4 text-center text-lg text-zinc-300">
         Everything you need to know about Tone Converter.
       </p>
       <div className="mt-10">
@@ -44,7 +44,7 @@ export default function FaqPage() {
       <div className="mt-10 text-center">
         <Link
           href="/#converter"
-          className="inline-block rounded-xl bg-indigo-600 px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-indigo-700"
+          className="btn-gradient inline-block rounded-xl px-8 py-3 text-base font-semibold"
         >
           Try the Tone Converter
         </Link>

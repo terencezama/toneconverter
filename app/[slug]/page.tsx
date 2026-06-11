@@ -32,15 +32,15 @@ export default async function UseCasePage({ params }: Props) {
 
   return (
     <>
-      <section className="bg-gradient-to-b from-indigo-50/60 to-transparent">
+      <section>
         <div className="mx-auto max-w-6xl px-4 pb-14 pt-14 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               {useCase.h1}
             </h1>
-            <p className="mt-4 text-lg text-zinc-600">{useCase.intro}</p>
+            <p className="mt-4 text-lg text-zinc-300">{useCase.intro}</p>
           </div>
-          <div className="mt-10">
+          <div className="mt-10" id="converter">
             <ToneConverter defaultTone={useCase.presetTone} />
           </div>
         </div>
@@ -48,51 +48,48 @@ export default async function UseCasePage({ params }: Props) {
 
       <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
         {useCase.body.map((paragraph) => (
-          <p key={paragraph.slice(0, 40)} className="mb-4 leading-relaxed text-zinc-600">
+          <p key={paragraph.slice(0, 40)} className="mb-4 leading-relaxed text-zinc-300">
             {paragraph}
           </p>
         ))}
 
-        <h2 className="mt-10 text-xl font-bold text-zinc-900">Example</h2>
+        <h2 className="mt-10 text-xl font-bold text-white">Example</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-zinc-200 bg-white p-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <div className="glass rounded-2xl p-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
               Before
             </p>
-            <p className="text-sm leading-relaxed text-zinc-600">
+            <p className="text-sm leading-relaxed text-zinc-300">
               {useCase.example.before}
             </p>
           </div>
-          <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-indigo-500">
+          <div className="glass rounded-2xl border-white/20 p-4">
+            <p className="text-gradient-live mb-2 text-xs font-semibold uppercase tracking-wide">
               After
             </p>
-            <p className="text-sm leading-relaxed text-zinc-800">
+            <p className="text-sm leading-relaxed text-zinc-100">
               {useCase.example.after}
             </p>
           </div>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-zinc-200 bg-white p-6 text-center">
-          <p className="text-zinc-600">
+        <div className="glass mt-10 rounded-3xl p-6 text-center">
+          <p className="text-zinc-300">
             Need a different tone? Try the full{" "}
-            <Link
-              href="/"
-              className="font-semibold text-indigo-600 hover:text-indigo-800"
-            >
+            <Link href="/" className="text-gradient-live font-semibold">
               Tone Converter
             </Link>{" "}
             with all tone and length options.
           </p>
         </div>
 
-        <h2 className="mt-12 text-xl font-bold text-zinc-900">Related tools</h2>
+        <h2 className="mt-12 text-xl font-bold text-white">Related tools</h2>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2">
           {others.map((other) => (
             <li key={other.slug}>
               <Link
                 href={`/${other.slug}`}
-                className="block rounded-xl border border-zinc-200 bg-white p-4 font-medium text-zinc-800 transition-colors hover:border-indigo-300 hover:bg-indigo-50/40"
+                className="glass block rounded-2xl p-4 font-medium text-zinc-100 transition-colors hover:bg-white/10"
               >
                 {other.navLabel}
               </Link>

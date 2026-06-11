@@ -58,10 +58,10 @@ export default function PricingPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl">
+        <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
           Simple, honest pricing
         </h1>
-        <p className="mt-4 text-lg text-zinc-600">
+        <p className="mt-4 text-lg text-zinc-300">
           Start free. Upgrade when you need more.
         </p>
       </div>
@@ -70,28 +70,26 @@ export default function PricingPage() {
         {PLANS.map((plan) => (
           <div
             key={plan.name}
-            className={`flex flex-col rounded-2xl border bg-white p-7 shadow-sm ${
-              plan.highlight
-                ? "border-indigo-400 ring-2 ring-indigo-100"
-                : "border-zinc-200"
+            className={`glass flex flex-col rounded-3xl p-7 ${
+              plan.highlight ? "border-white/25 shadow-2xl shadow-black/40" : ""
             }`}
           >
             {plan.highlight && (
-              <span className="mb-3 self-start rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
+              <span className="btn-gradient mb-3 self-start rounded-full px-3 py-1 text-xs font-semibold">
                 Most popular
               </span>
             )}
-            <h2 className="text-lg font-bold text-zinc-900">{plan.name}</h2>
+            <h2 className="text-lg font-bold text-white">{plan.name}</h2>
             <p className="mt-2">
-              <span className="text-4xl font-extrabold text-zinc-900">
+              <span className="text-gradient-live text-4xl font-extrabold">
                 {plan.price}
               </span>{" "}
-              <span className="text-sm text-zinc-500">{plan.period}</span>
+              <span className="text-sm text-zinc-400">{plan.period}</span>
             </p>
             <ul className="mt-6 flex-1 space-y-3">
               {plan.features.map((feature) => (
-                <li key={feature} className="flex items-start gap-2 text-sm text-zinc-600">
-                  <span className="mt-0.5 text-indigo-600" aria-hidden>
+                <li key={feature} className="flex items-start gap-2 text-sm text-zinc-300">
+                  <span className="text-gradient-live mt-0.5" aria-hidden>
                     ✓
                   </span>
                   {feature}
@@ -102,8 +100,8 @@ export default function PricingPage() {
               href={plan.href}
               className={`mt-8 rounded-xl px-5 py-2.5 text-center text-sm font-semibold transition-colors ${
                 plan.highlight
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                  : "border border-zinc-300 text-zinc-700 hover:bg-zinc-50"
+                  ? "btn-gradient"
+                  : "border border-white/15 bg-white/5 text-zinc-200 hover:bg-white/10"
               }`}
             >
               {plan.cta}
