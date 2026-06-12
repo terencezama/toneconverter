@@ -18,11 +18,13 @@ export type ToneRobotConfig = {
   effect?: "heartPulse" | null;
   /** Disable idle body bobbing for static symbolic poses. */
   stationary?: boolean;
+  /** Per-tone animation speed multiplier. */
+  animationSpeed?: number;
 };
 
 /** 3D robot behaviour per conversion tone. */
 export const TONE_ROBOT: Record<ToneId, ToneRobotConfig> = {
-  professional: { idle: "Standing", accessory: "suit" },
+  professional: { idle: "Standing", accessory: "suit", stationary: true, animationSpeed: 0.45 },
   formal: { idle: "Walking", accessory: "suit" },
   polite: { idle: "Standing", pose: "bowRelease" },
   friendly: { idle: "Idle", pose: "peace" },

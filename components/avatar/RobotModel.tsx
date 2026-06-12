@@ -351,6 +351,7 @@ export function RobotModel({
   const effectiveMood = toneStyle?.mood ?? mood;
   const targetExpression = resolveExpression(effectiveMood, toneStyle?.mood);
   const robotPose = robotConfig?.pose ?? null;
+  const animationSpeed = robotConfig?.animationSpeed ?? 1;
 
   useEffect(() => {
     const materialBindings: MaterialBinding[] = [];
@@ -418,9 +419,9 @@ export function RobotModel({
 
     if (previous) previous.fadeOut(duration);
 
-    next.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(duration).play();
+    next.reset().setEffectiveTimeScale(animationSpeed).setEffectiveWeight(1).fadeIn(duration).play();
     activeActionRef.current = next;
-  }, []);
+  }, [animationSpeed]);
 
   const restoreAnimation = useCallback(() => {
     if (robotConfig?.holdEmote) return;

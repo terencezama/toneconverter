@@ -1,35 +1,45 @@
 "use client";
 
+import { createPortal } from "@react-three/fiber";
 import { useMemo } from "react";
 import * as THREE from "three";
 import type { RobotAccessory } from "@/lib/avatar/toneRobot";
-import { BoneMount, findRobotBone } from "./BoneMount";
+import { findRobotBone } from "./BoneMount";
 
 function SuitAndTie({ accent }: { accent: string }) {
   const tieColor = new THREE.Color(accent);
   const jacketColor = new THREE.Color("#171821");
   const lapelColor = new THREE.Color("#2a2a35");
+  const shirtColor = new THREE.Color("#f3f6fb");
 
   return (
     <group>
-      <mesh position={[0, 0.05, -0.005]}>
-        <boxGeometry args={[0.56, 0.58, 0.035]} />
+      <mesh position={[0, -0.05, 0]}>
+        <boxGeometry args={[0.6, 0.5, 0.032]} />
         <meshStandardMaterial color={jacketColor} metalness={0.12} roughness={0.7} />
       </mesh>
-      <mesh position={[-0.16, 0.18, 0.02]} rotation={[0, 0, 0.38]}>
-        <boxGeometry args={[0.18, 0.34, 0.03]} />
+      <mesh position={[0, -0.04, 0.035]}>
+        <boxGeometry args={[0.22, 0.34, 0.018]} />
+        <meshStandardMaterial color={shirtColor} metalness={0.05} roughness={0.85} />
+      </mesh>
+      <mesh position={[-0.15, 0.005, 0.062]} rotation={[0, 0, 0.28]}>
+        <boxGeometry args={[0.13, 0.36, 0.022]} />
         <meshStandardMaterial color={lapelColor} metalness={0.15} roughness={0.65} />
       </mesh>
-      <mesh position={[0.16, 0.18, 0.02]} rotation={[0, 0, -0.38]}>
-        <boxGeometry args={[0.18, 0.34, 0.03]} />
+      <mesh position={[0.15, 0.005, 0.062]} rotation={[0, 0, -0.28]}>
+        <boxGeometry args={[0.13, 0.36, 0.022]} />
         <meshStandardMaterial color={lapelColor} metalness={0.15} roughness={0.65} />
       </mesh>
-      <mesh position={[0, 0.32, 0.03]}>
-        <boxGeometry args={[0.28, 0.08, 0.025]} />
-        <meshStandardMaterial color="#eef1f8" metalness={0.05} roughness={0.85} />
+      <mesh position={[-0.08, 0.165, 0.083]} rotation={[0, 0, -0.26]}>
+        <boxGeometry args={[0.17, 0.065, 0.022]} />
+        <meshStandardMaterial color={shirtColor} metalness={0.05} roughness={0.85} />
       </mesh>
-      <mesh position={[0, 0.26, 0.05]}>
-        <boxGeometry args={[0.11, 0.09, 0.045]} />
+      <mesh position={[0.08, 0.165, 0.083]} rotation={[0, 0, 0.26]}>
+        <boxGeometry args={[0.17, 0.065, 0.022]} />
+        <meshStandardMaterial color={shirtColor} metalness={0.05} roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 0.11, 0.105]}>
+        <boxGeometry args={[0.095, 0.085, 0.032]} />
         <meshStandardMaterial
           color={tieColor}
           emissive={tieColor}
@@ -38,8 +48,8 @@ function SuitAndTie({ accent }: { accent: string }) {
           roughness={0.45}
         />
       </mesh>
-      <mesh position={[0, 0.02, 0.04]} rotation={[0.08, 0, 0]}>
-        <boxGeometry args={[0.09, 0.42, 0.022]} />
+      <mesh position={[0, -0.065, 0.098]}>
+        <boxGeometry args={[0.085, 0.34, 0.026]} />
         <meshStandardMaterial
           color={tieColor}
           emissive={tieColor}
@@ -159,15 +169,43 @@ function IntellectualGlasses({ accent }: { accent: string }) {
   );
 }
 
+function ModelBoneMount({
+  bone,
+  position,
+  rotation,
+  scale,
+  children,
+}: {
+  bone: THREE.Object3D | null;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: number;
+  children: React.ReactNode;
+}) {
+  if (!bone) return null;
+
+  return createPortal(
+    <group name="ToneRobotAccessory" position={position} rotation={rotation} scale={scale}>
+      {children}
+    </group>,
+    bone
+  );
+}
+
 const BONE_LAYOUT: Record<
   Exclude<RobotAccessory, null>,
-  { bone: "Body" | "Head"; position: [number, number, number]; rotation: [number, number, number]; scale: number }
+  {
+    bone: "Body" | "Torso_1" | "Head";
+    position: [number, number, number];
+    rotation: [number, number, number];
+    scale: number;
+  }
 > = {
   suit: {
-    bone: "Body",
-    position: [0, 0.12, 0.18],
-    rotation: [0.1, 0, 0],
-    scale: 1.65,
+    bone: "Torso_1",
+    position: [0, 0.003, 0.0094],
+    rotation: [-0.06, 0, 0],
+    scale: 0.0112,
   },
   streetwear: {
     bone: "Body",
@@ -203,7 +241,7 @@ export function RobotAccessories({
   const layout = BONE_LAYOUT[accessory];
 
   return (
-    <BoneMount
+    <ModelBoneMount
       bone={attachBone}
       position={layout.position}
       rotation={layout.rotation}
@@ -212,6 +250,6 @@ export function RobotAccessories({
       {accessory === "suit" && <SuitAndTie accent={accent} />}
       {accessory === "streetwear" && <Streetwear />}
       {accessory === "glasses" && <IntellectualGlasses accent={accent} />}
-    </BoneMount>
+    </ModelBoneMount>
   );
 }
