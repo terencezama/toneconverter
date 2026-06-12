@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FaqAccordion } from "@/components/FaqAccordion";
+import { HeroSection } from "@/components/landing/HeroSection";
 import { ToneConverter } from "@/components/ToneConverter";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { SITE_URL } from "@/lib/site";
@@ -53,32 +54,9 @@ export default function HomePage() {
     <>
       <JsonLd />
 
-      {/* Hero + tool */}
-      <section id="converter">
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pt-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="glass mx-auto mb-5 inline-block rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-300">
-              The emotion-aware writing assistant
-            </p>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
-              Your words have a <span className="text-gradient-live">feeling</span>.
-              <br />
-              We can see it.
-            </h1>
-            <p className="mt-5 text-lg text-zinc-300">
-              Paste anything — the page reads the emotion in your writing and the
-              world around it reacts. Then convert angry, casual, or messy text into
-              clear, polite, professional messages instantly.
-            </p>
-            <p className="mt-2 text-sm font-semibold text-gradient">
-              Write it badly. Send it professionally.
-            </p>
-          </div>
-          <div className="mt-10">
-            <ToneConverter />
-          </div>
-        </div>
-      </section>
+      <HeroSection>
+        <ToneConverter />
+      </HeroSection>
 
       {/* SEO sections */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">

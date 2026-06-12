@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { describeEmotionShift } from "@/lib/emotion/emotionUi";
 import type { EmotionState } from "@/lib/emotion/types";
-import { useEmotion } from "./emotion/EmotionProvider";
+import type { ToneId } from "@/lib/tones";
+import { PanelAvatar } from "./avatar/ConverterRobotAside";
 
 export function OutputCard({
   original,
@@ -12,20 +13,22 @@ export function OutputCard({
   tone,
   loading,
   beforeEmotion,
+  afterEmotion,
   onRegenerate,
 }: {
   original: string;
   result: string;
-  tone: string;
+  tone: ToneId;
   loading: boolean;
   beforeEmotion: EmotionState;
+  afterEmotion: EmotionState | null;
   onRegenerate: () => void;
 }) {
-  const { state } = useEmotion();
   const cardRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const [showBefore, setShowBefore] = useState(false);
-  const shiftLabel = describeEmotionShift(beforeEmotion, state);
+  const afterState = afterEmotion ?? beforeEmotion;
+  const shiftLabel = describeEmotionShift(beforeEmotion, afterState);
 
   useEffect(() => {
     if (!cardRef.current) return;
@@ -82,23 +85,33 @@ export function OutputCard({
       </div>
 
       {showBefore && (
-        <div className="mb-3 rounded-2xl border border-white/10 bg-black/30 p-4">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Before
-          </p>
-          <p className="whitespace-pre-wrap text-sm text-zinc-400">{original}</p>
+        <div className="mb-3 flex gap-3 rounded-2xl border border-white/10 bg-black/30 p-4">
+          <div className="min-w-0 flex-1">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              Before
+            </p>
+            <p className="whitespace-pre-wrap text-sm text-zinc-400">{original}</p>
+          </div>
+          <PanelAvatar emotion={beforeEmotion} muted />
         </div>
       )}
 
-      <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-        {showBefore && (
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            After
+      <div className="flex gap-3 rounded-2xl border border-white/10 bg-black/30 p-4">
+        <div className="min-w-0 flex-1">
+          {showBefore && (
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              After
+            </p>
+          )}
+          <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-50">
+            {result}
           </p>
-        )}
-        <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-50">
-          {result}
-        </p>
+        </div>
+        <PanelAvatar
+          emotion={afterState}
+          tone={tone}
+          thinking={loading}
+        />
       </div>
 
       <div className="mt-4 flex flex-wrap gap-3">

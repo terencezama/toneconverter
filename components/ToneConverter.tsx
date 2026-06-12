@@ -4,8 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { analyzeHeuristic } from "@/lib/emotion/heuristic";
 import type { EmotionState } from "@/lib/emotion/types";
+import { readJsonResponse } from "@/lib/fetchJson";
 import { LENGTHS, MAX_CHARS, TONES, type LengthId, type ToneId } from "@/lib/tones";
 import { AssistantBubble } from "./avatar/AssistantBubble";
+import { ConverterRobotAside } from "./avatar/ConverterRobotAside";
 import { useEmotion } from "./emotion/EmotionProvider";
 import { OriginalityChecker } from "./OriginalityChecker";
 import { OutputCard } from "./OutputCard";
@@ -55,8 +57,8 @@ export function ToneConverter({
 
   useEffect(() => {
     fetch("/api/providers")
-      .then((res) => res.json())
-      .then((data: { providers: ProviderInfo[] }) => {
+      .then((res) => readJsonResponse<{ providers: ProviderInfo[] }>(res))
+      .then((data) => {
         if (data.providers?.length) {
           setProviders(data.providers);
           setProvider((current) =>
@@ -91,14 +93,13 @@ export function ToneConverter({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: currentText, tone: useTone, length, provider }),
         });
-        const data = (await res.json()) as { result?: string; error?: string };
+        const data = await readJsonResponse<{ result?: string; error?: string }>(res);
         if (!res.ok || !data.result) {
           throw new Error(data.error ?? "Something went wrong. Please try again.");
         }
         setResult(data.result);
         setOriginal(currentText);
         setAfterConvertState(analyzeHeuristic(data.result));
-        feedText(data.result, { pasted: true });
         trackEvent("convert_success", { tone: useTone, length, provider });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -108,7 +109,7 @@ export function ToneConverter({
         setConverting(false);
       }
     },
-    [tone, length, provider, state, feedText, setConverting]
+    [tone, length, provider, state, setConverting]
   );
 
   // Let the assistant avatar trigger conversions ("Make it professional").
@@ -138,14 +139,15 @@ export function ToneConverter({
   }
 
   const charsLeft = MAX_CHARS - text.length;
-  const showAvatarCompare = Boolean(result) || loading;
+  const pinOriginalEmotion = loading || result ? beforeConvertState : null;
+  const robotEmotion = afterConvertState ?? state;
   const showEmotion =
     text.trim().length > 0 &&
     (state.emotion !== "neutral" || state.messiness > 0.35);
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
-      <div className="glass rounded-3xl p-4 shadow-2xl shadow-black/30 sm:p-6">
+    <div className="relative mx-auto w-full max-w-3xl overflow-visible">
+      <div className="glass overflow-visible rounded-3xl p-4 shadow-2xl shadow-black/30 sm:p-6">
         <div className="mb-4 flex gap-2 rounded-2xl border border-white/10 bg-black/20 p-1">
           {(
             [
@@ -179,23 +181,13 @@ export function ToneConverter({
             onPaste={handlePaste}
             placeholder="Paste your message here — I'll feel it as you type..."
             rows={6}
-            className={`glass-input w-full resize-y rounded-2xl p-4 text-base text-zinc-100 placeholder:text-zinc-500 transition-all duration-500 ${
-              showAvatarCompare
-                ? "pb-20 pr-[10.5rem] sm:pb-[5.25rem] sm:pr-[11.5rem]"
-                : "pb-16 pr-16 sm:pb-[4.25rem] sm:pr-[4.5rem]"
-            } ${
+            className={`glass-input w-full resize-y rounded-2xl p-4 pb-16 pr-16 text-base text-zinc-100 placeholder:text-zinc-500 transition-all duration-500 sm:pb-[4.25rem] sm:pr-[4.5rem] ${
               loading
                 ? "animate-convert-pulse ring-2 ring-[color-mix(in_srgb,var(--emotion-c)_45%,transparent)]"
                 : ""
             }`}
           />
-          <AssistantBubble
-            anchored
-            showCompare={showAvatarCompare}
-            beforeEmotion={beforeConvertState}
-            afterEmotion={afterConvertState}
-            selectedTone={showAvatarCompare ? tone : null}
-          />
+          <AssistantBubble anchored emotionOverride={pinOriginalEmotion} />
           {loading && (
             <div
               className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/[0.04] to-transparent"
@@ -351,6 +343,12 @@ export function ToneConverter({
         )}
       </div>
 
+      <ConverterRobotAside
+        emotion={robotEmotion}
+        tone={tone}
+        loading={loading}
+      />
+
       {tab === "convert" && result && (
         <OutputCard
           original={original}
@@ -358,6 +356,7 @@ export function ToneConverter({
           tone={tone}
           loading={loading}
           beforeEmotion={beforeConvertState}
+          afterEmotion={afterConvertState}
           onRegenerate={() => convert({ isRegenerate: true })}
         />
       )}

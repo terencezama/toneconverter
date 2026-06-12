@@ -25,7 +25,7 @@ const STYLES: Record<ToneId, ToneAvatarStyle> = {
     mood: "zen",
     mouth: "M46 81 Q60 85 74 81",
     accessory: "suit",
-    pose: "bow",
+    pose: null,
   },
   polite: {
     mood: "happy",
@@ -74,7 +74,7 @@ const STYLES: Record<ToneId, ToneAvatarStyle> = {
   },
   longer: {
     mood: "zen",
-    accessory: "glasses",
+    accessory: null,
     pose: null,
   },
   clearer: {
