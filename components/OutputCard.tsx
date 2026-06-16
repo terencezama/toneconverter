@@ -4,13 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
 import { describeEmotionShift } from "@/lib/emotion/emotionUi";
 import type { EmotionState } from "@/lib/emotion/types";
-import type { ToneId } from "@/lib/tones";
+import type { LengthId, OutcomeId, ToneId } from "@/lib/tones";
+import { describeRewriteChanges } from "../../shared/rewriteChanges";
 import { PanelAvatar } from "./avatar/ConverterRobotAside";
 
 export function OutputCard({
   original,
   result,
   tone,
+  length,
+  outcome,
   loading,
   beforeEmotion,
   afterEmotion,
@@ -19,6 +22,8 @@ export function OutputCard({
   original: string;
   result: string;
   tone: ToneId;
+  length: LengthId;
+  outcome: OutcomeId | null;
   loading: boolean;
   beforeEmotion: EmotionState;
   afterEmotion: EmotionState | null;
@@ -29,6 +34,15 @@ export function OutputCard({
   const [showBefore, setShowBefore] = useState(false);
   const afterState = afterEmotion ?? beforeEmotion;
   const shiftLabel = describeEmotionShift(beforeEmotion, afterState);
+  const changeLabels = describeRewriteChanges({
+    original,
+    result,
+    tone,
+    length,
+    outcome,
+    beforeEmotion,
+    afterEmotion: afterState,
+  });
 
   useEffect(() => {
     if (!cardRef.current) return;
@@ -82,6 +96,17 @@ export function OutputCard({
         >
           {showBefore ? "Hide original" : "Compare with original"}
         </button>
+      </div>
+
+      <div className="mb-3 flex flex-wrap gap-2">
+        {changeLabels.map((label) => (
+          <span
+            key={label}
+            className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-zinc-300"
+          >
+            {label}
+          </span>
+        ))}
       </div>
 
       {showBefore && (

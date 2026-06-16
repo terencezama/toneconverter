@@ -39,8 +39,13 @@ export function AssistantBubble({
   const displayState = emotionOverride ?? state;
   const currentMood = EMOTION_PALETTES[displayState.emotion].mood;
   const llmReady = Boolean(analysis && (analysis.summary || analysis.suggestion));
+  // Temporarily disabled: the writing-assistant suggestion dialog is turned off
+  // for now. Flip back to `true` to re-enable.
+  const ASSISTANT_DIALOG_ENABLED = false;
   const showBubble =
-    !assistantHidden && (Boolean(quickRead) || analyzing || llmReady);
+    ASSISTANT_DIALOG_ENABLED &&
+    !assistantHidden &&
+    (Boolean(quickRead) || analyzing || llmReady);
 
   const summary =
     analysis?.summary || quickRead?.summary || (analyzing ? "Reading the room…" : "");

@@ -86,28 +86,38 @@ function holdTrack(track: THREE.KeyframeTrack, duration: number): THREE.Keyframe
   return new TrackCtor(track.name, [0, duration / 2, duration], [...values, ...mid, ...values]);
 }
 
-function meditationClips(animations: THREE.AnimationClip[]): THREE.AnimationClip[] {
-  const sitting = animations.find((clip) => clip.name === "Sitting");
-  if (!sitting) return animations;
-
+function deriveRuntimeClips(animations: THREE.AnimationClip[]): THREE.AnimationClip[] {
   const existing = new Set(animations.map((clip) => clip.name));
   const extras: THREE.AnimationClip[] = [];
 
-  if (!existing.has("SitToMeditate")) {
-    extras.push(copyClip("SitToMeditate", sitting));
+  const sitting = animations.find((clip) => clip.name === "Sitting");
+  if (sitting) {
+    if (!existing.has("SitToMeditate")) {
+      extras.push(copyClip("SitToMeditate", sitting));
+    }
+    if (!existing.has("Meditate")) {
+      extras.push(
+        new THREE.AnimationClip(
+          "Meditate",
+          3.2,
+          sitting.tracks.map((track) => holdTrack(track, 3.2))
+        )
+      );
+    }
   }
 
-  if (!existing.has("Meditate")) {
-    extras.push(
-      new THREE.AnimationClip(
-        "Meditate",
-        3.2,
-        sitting.tracks.map((track) => holdTrack(track, 3.2))
-      )
-    );
+  // Looping versions of one-shot emotes so a tone can hold them as its idle:
+  // friendly = continuous wave, confident = continuous thumbs-up.
+  const wave = animations.find((clip) => clip.name === "Wave");
+  if (wave && !existing.has("WaveLoop")) {
+    extras.push(copyClip("WaveLoop", wave));
+  }
+  const thumbsUp = animations.find((clip) => clip.name === "ThumbsUp");
+  if (thumbsUp && !existing.has("ThumbsUpLoop")) {
+    extras.push(copyClip("ThumbsUpLoop", thumbsUp));
   }
 
-  return [...animations, ...extras];
+  return extras.length ? [...animations, ...extras] : animations;
 }
 
 function findHeadMesh(root: THREE.Object3D): THREE.SkinnedMesh | null {
@@ -122,39 +132,21 @@ function findHeadMesh(root: THREE.Object3D): THREE.SkinnedMesh | null {
   return head;
 }
 
-function applyPose(
-  pose: RobotPose,
-  poseRef: THREE.Group,
-  delta: number,
-  bowRef: React.MutableRefObject<number>,
-  bowPulseRef: React.MutableRefObject<number>,
-  bowReleaseRef: React.MutableRefObject<number>,
-  t: number
-) {
-  const lerp = (current: number, target: number, speed: number) =>
-    THREE.MathUtils.lerp(current, target, 1 - Math.exp(-speed * delta));
-
+function applyPose(pose: RobotPose, poseRef: THREE.Group, t: number) {
   let rotX = 0;
-  let rotZ = 0;
   let rotY = 0.15;
   let scale = 1;
   let yOff = 0;
+  const rotZ = 0;
 
-  if (pose === "bow" || pose === "bowRelease") {
-    bowPulseRef.current = lerp(bowPulseRef.current, 0.62, 2.4);
-    bowRef.current = lerp(bowRef.current, 1, 3.5);
-    const release = pose === "bowRelease" ? bowReleaseRef.current : 0;
-    const bowAmt = bowRef.current * bowPulseRef.current * (1 - release * 0.55);
-    rotX = -0.48 * bowAmt;
-    yOff = -0.28 * bowAmt;
-    rotY = 0.08;
-    if (pose === "bowRelease") {
-      bowReleaseRef.current = lerp(bowReleaseRef.current, 1, 0.55);
-    }
-  } else {
-    bowRef.current = lerp(bowRef.current, 0, 5);
-    bowPulseRef.current = lerp(bowPulseRef.current, 0, 5);
-    bowReleaseRef.current = lerp(bowReleaseRef.current, 0, 5);
+  if (pose === "nod") {
+    // Gentle, repeating courteous nod: a soft forward dip then a rest beat.
+    const period = 2.4;
+    const phase = (t % period) / period;
+    const dip = phase < 0.5 ? Math.sin((phase / 0.5) * Math.PI) : 0;
+    rotX = -0.14 * dip;
+    yOff = -0.03 * dip;
+    rotY = 0.12;
   }
 
   if (pose === "meditate") {
@@ -163,17 +155,6 @@ function applyPose(
     yOff = -0.2 + Math.sin(t * 0.75) * 0.025;
     rotY = 0.05;
     scale = 0.94 + breath * 0.012;
-  }
-
-  if (pose === "peace") {
-    rotZ = 0.06;
-    rotY = 0.2;
-    yOff += Math.sin(t * 2.2) * 0.01;
-  }
-
-  if (pose === "thumbsUp") {
-    rotY = 0.18;
-    rotZ = -0.025;
   }
 
   poseRef.rotation.x = rotX;
@@ -318,7 +299,7 @@ export function RobotModel({
   modelY = -0.05,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(MODEL_URL);
-  const modelAnimations = useMemo(() => meditationClips(animations), [animations]);
+  const modelAnimations = useMemo(() => deriveRuntimeClips(animations), [animations]);
   const model = useMemo(() => cloneSkinned(scene), [scene]);
   const groupRef = useRef<THREE.Group>(null);
   const poseRef = useRef<THREE.Group>(null);
@@ -330,9 +311,6 @@ export function RobotModel({
   const expressionRef = useRef<MorphExpression>(resolveExpression(mood));
   const shakeRef = useRef(0);
   const excitedBobRef = useRef(0);
-  const bowRef = useRef(0);
-  const bowPulseRef = useRef(0);
-  const bowReleaseRef = useRef(0);
   const stretchYRef = useRef(1);
   const lastToneRef = useRef<ToneId | null>(null);
   const materialBindingsRef = useRef<MaterialBinding[]>([]);
@@ -439,17 +417,13 @@ export function RobotModel({
   useEffect(() => {
     if (tone && tone !== lastToneRef.current) {
       stretchYRef.current = 1;
-      if (robotPose === "bow" || robotPose === "bowRelease") {
-        bowRef.current = 0;
-        bowPulseRef.current = 1.15;
-        bowReleaseRef.current = 0;
-      }
-      // Force animation swap when tone pill changes.
-      const anim = resolveBaseAnimation(effectiveMood, thinking, tone);
+      // Force animation swap when tone pill changes. Lead with the one-shot
+      // emote when the tone has one so it isn't clobbered by the idle swap.
+      const anim = robotConfig?.emote ?? resolveBaseAnimation(effectiveMood, thinking, tone);
       requestAnimationFrame(() => fadeToAction(anim, 0.25, true));
     }
     lastToneRef.current = tone;
-  }, [tone, robotPose, effectiveMood, fadeToAction, thinking]);
+  }, [tone, robotConfig?.emote, effectiveMood, fadeToAction, thinking]);
 
   useEffect(() => {
     if (!tone || !robotConfig?.emote) return;
@@ -525,7 +499,7 @@ export function RobotModel({
     group.position.x = offsetX;
     group.position.y = offsetY;
 
-    applyPose(robotPose, pose, delta, bowRef, bowPulseRef, bowReleaseRef, t);
+    applyPose(robotPose, pose, t);
 
     const stretchTarget = robotConfig?.stretch ? STRETCH_TARGET[robotConfig.stretch] : 1;
     stretchYRef.current = THREE.MathUtils.lerp(

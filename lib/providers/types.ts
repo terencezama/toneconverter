@@ -1,7 +1,10 @@
+import type { LengthId, OutcomeId, ToneId } from "../../../shared/tones";
+
 export type ConvertParams = {
   text: string;
-  tone: string;
-  length: "normal" | "shorter" | "longer";
+  tone: ToneId;
+  length: LengthId;
+  outcome?: OutcomeId | null;
 };
 
 export interface ToneProvider {

@@ -5,7 +5,15 @@ import { trackEvent } from "@/lib/analytics";
 import { analyzeHeuristic } from "@/lib/emotion/heuristic";
 import type { EmotionState } from "@/lib/emotion/types";
 import { readJsonResponse } from "@/lib/fetchJson";
-import { LENGTHS, MAX_CHARS, TONES, type LengthId, type ToneId } from "@/lib/tones";
+import {
+  LENGTHS,
+  MAX_CHARS,
+  OUTCOMES,
+  TONES,
+  type LengthId,
+  type OutcomeId,
+  type ToneId,
+} from "@/lib/tones";
 import { AssistantBubble } from "./avatar/AssistantBubble";
 import { ConverterRobotAside } from "./avatar/ConverterRobotAside";
 import { useEmotion } from "./emotion/EmotionProvider";
@@ -33,6 +41,7 @@ export function ToneConverter({
   const [text, setText] = useState("");
   const [tone, setTone] = useState<ToneId>(defaultTone);
   const [length, setLength] = useState<LengthId>("normal");
+  const [outcome, setOutcome] = useState<OutcomeId | null>(null);
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [provider, setProvider] = useState<string>("openai");
   const [result, setResult] = useState<string | null>(null);
@@ -84,6 +93,7 @@ export function ToneConverter({
       trackEvent(overrides?.isRegenerate ? "regenerate" : "convert", {
         tone: useTone,
         length,
+        outcome,
         provider,
       });
 
@@ -91,7 +101,7 @@ export function ToneConverter({
         const res = await fetch("/api/convert-tone", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: currentText, tone: useTone, length, provider }),
+          body: JSON.stringify({ text: currentText, tone: useTone, length, outcome, provider }),
         });
         const data = await readJsonResponse<{ result?: string; error?: string }>(res);
         if (!res.ok || !data.result) {
@@ -100,16 +110,16 @@ export function ToneConverter({
         setResult(data.result);
         setOriginal(currentText);
         setAfterConvertState(analyzeHeuristic(data.result));
-        trackEvent("convert_success", { tone: useTone, length, provider });
+        trackEvent("convert_success", { tone: useTone, length, outcome, provider });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong.");
-        trackEvent("convert_error", { tone: useTone, length, provider });
+        trackEvent("convert_error", { tone: useTone, length, outcome, provider });
       } finally {
         setLoading(false);
         setConverting(false);
       }
     },
-    [tone, length, provider, state, setConverting]
+    [tone, length, outcome, provider, state, setConverting]
   );
 
   // Let the assistant avatar trigger conversions ("Make it professional").
@@ -292,6 +302,27 @@ export function ToneConverter({
                   </select>
                 </div>
 
+                <div className="flex items-center gap-2">
+                  <label htmlFor="outcome-select" className="text-sm text-zinc-400">
+                    Goal
+                  </label>
+                  <select
+                    id="outcome-select"
+                    value={outcome ?? ""}
+                    onChange={(e) =>
+                      setOutcome(e.target.value ? (e.target.value as OutcomeId) : null)
+                    }
+                    className="glass-input rounded-lg px-2.5 py-1.5 text-sm text-zinc-200 [&>option]:bg-zinc-900"
+                  >
+                    <option value="">None</option>
+                    {OUTCOMES.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {providers.length > 1 && (
                   <div className="flex items-center gap-2">
                     <label htmlFor="provider-select" className="text-sm text-zinc-400">
@@ -354,6 +385,8 @@ export function ToneConverter({
           original={original}
           result={result}
           tone={tone}
+          length={length}
+          outcome={outcome}
           loading={loading}
           beforeEmotion={beforeConvertState}
           afterEmotion={afterConvertState}

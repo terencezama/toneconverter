@@ -11,11 +11,11 @@ import {
   type ReactNode,
 } from "react";
 import { analyzeHeuristic } from "@/lib/emotion/heuristic";
-import { EMOTION_PALETTES } from "@/lib/emotion/palette";
 import { quickRead } from "@/lib/emotion/quickRead";
 import { readJsonResponse } from "@/lib/fetchJson";
 import { detectTones, isToneId } from "@/lib/emotion/toneDetect";
 import type { ToneId } from "@/lib/tones";
+import { emotionColorsForState } from "../../../shared/emotion/color";
 import {
   NEUTRAL_STATE,
   isEmotionId,
@@ -51,23 +51,6 @@ const MOOD_DEBOUNCE_MS = 650;
 const DEEP_DEBOUNCE_MS = 950;
 const STRONG_SIGNAL_INTENSITY = 0.32;
 
-const NEUTRAL_COLORS = EMOTION_PALETTES.neutral.colors;
-
-function mixHex(a: string, b: string, t: number): string {
-  const parse = (h: string) => [
-    parseInt(h.slice(1, 3), 16),
-    parseInt(h.slice(3, 5), 16),
-    parseInt(h.slice(5, 7), 16),
-  ];
-  const [ar, ag, ab] = parse(a);
-  const [br, bg, bb] = parse(b);
-  const lerp = (x: number, y: number) => Math.round(x + (y - x) * t);
-  const r = lerp(ar, br);
-  const g = lerp(ag, bg);
-  const bl = lerp(ab, bb);
-  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${bl.toString(16).padStart(2, "0")}`;
-}
-
 export function EmotionProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<EmotionState>(NEUTRAL_STATE);
   const [analysis, setAnalysis] = useState<EmotionAnalysis | null>(null);
@@ -89,21 +72,11 @@ export function EmotionProvider({ children }: { children: ReactNode }) {
 
   // Push live palette into CSS vars on every state tick (intensity-weighted).
   useEffect(() => {
-    const palette = EMOTION_PALETTES[state.emotion];
-    const t = Math.min(1, state.intensity * 1.15 + state.messiness * 0.25);
+    const [a, b, c] = emotionColorsForState(state);
     const root = document.documentElement;
-    root.style.setProperty(
-      "--emotion-a",
-      mixHex(NEUTRAL_COLORS[0], palette.colors[0], t)
-    );
-    root.style.setProperty(
-      "--emotion-b",
-      mixHex(NEUTRAL_COLORS[1], palette.colors[1], t)
-    );
-    root.style.setProperty(
-      "--emotion-c",
-      mixHex(NEUTRAL_COLORS[2], palette.colors[2], t)
-    );
+    root.style.setProperty("--emotion-a", a);
+    root.style.setProperty("--emotion-b", b);
+    root.style.setProperty("--emotion-c", c);
   }, [state]);
 
   const applyHeuristic = useCallback((text: string) => {

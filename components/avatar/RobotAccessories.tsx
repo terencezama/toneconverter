@@ -215,9 +215,9 @@ const BONE_LAYOUT: Record<
   },
   glasses: {
     bone: "Head",
-    position: [0, 0.06, 0.24],
+    position: [0, 0, 0.024],
     rotation: [0, 0, 0],
-    scale: 1.25,
+    scale: 0.06,
   },
 };
 

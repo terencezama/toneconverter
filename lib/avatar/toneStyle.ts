@@ -61,7 +61,7 @@ const STYLES: Record<ToneId, ToneAvatarStyle> = {
     pose: "confident",
   },
   empathetic: {
-    mood: "worried",
+    mood: "zen",
     mouth: "M44 80 Q60 86 76 80",
     eyeRy: 8,
     accessory: "heart",

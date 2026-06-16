@@ -14,7 +14,9 @@ Important runtime hooks:
   `LowerArm.R`, `UpperLeg.L`, `LowerLeg.L`, `UpperLeg.R`, `LowerLeg.R`
 - Source clips: `Standing`, `Idle`, `Walking`, `Running`, `Sitting`, `Wave`,
   `Yes`, `No`, `Jump`, `Punch`, `ThumbsUp`, `Dance`, `WalkJump`, `Death`
-- Runtime clips added from `Sitting`: `SitToMeditate`, `Meditate`
+- Runtime clips derived in `deriveRuntimeClips` (RobotModel.tsx): `SitToMeditate`
+  + `Meditate` (from `Sitting`), `WaveLoop` (looping `Wave`, used by friendly),
+  `ThumbsUpLoop` (looping `ThumbsUp`, used by confident)
 
 Regenerate the fallback after edits with:
 

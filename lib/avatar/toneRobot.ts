@@ -1,7 +1,7 @@
 import type { ToneId } from "@/lib/tones";
 
 export type RobotAccessory = "suit" | "streetwear" | "glasses" | null;
-export type RobotPose = "bow" | "bowRelease" | "meditate" | "peace" | "thumbsUp" | null;
+export type RobotPose = "nod" | "meditate" | null;
 export type RobotStretch = "longer" | "shorter" | null;
 
 export type ToneRobotConfig = {
@@ -25,13 +25,13 @@ export type ToneRobotConfig = {
 /** 3D robot behaviour per conversion tone. */
 export const TONE_ROBOT: Record<ToneId, ToneRobotConfig> = {
   professional: { idle: "Standing", accessory: "suit", stationary: true, animationSpeed: 0.45 },
-  formal: { idle: "Walking", accessory: "suit" },
-  polite: { idle: "Standing", pose: "bowRelease" },
-  friendly: { idle: "Idle", pose: "peace" },
+  formal: { idle: "Standing", accessory: "suit", pose: "nod", stationary: true, animationSpeed: 0.6 },
+  polite: { idle: "Standing", emote: "Wave", pose: "nod" },
+  friendly: { idle: "WaveLoop" },
   calm: { idle: "Meditate", emote: "SitToMeditate", pose: "meditate", stationary: true },
-  casual: { idle: "Walking", accessory: "streetwear" },
-  confident: { idle: "Standing", pose: "thumbsUp", stationary: true },
-  empathetic: { idle: "Idle", effect: "heartPulse" },
+  casual: { idle: "Walking", accessory: "streetwear", animationSpeed: 0.85 },
+  confident: { idle: "ThumbsUpLoop" },
+  empathetic: { idle: "Idle", pose: "nod", effect: "heartPulse" },
   shorter: { idle: "Standing", stretch: "shorter" },
   longer: { idle: "Standing", stretch: "longer" },
   clearer: { idle: "Idle", accessory: "glasses" },

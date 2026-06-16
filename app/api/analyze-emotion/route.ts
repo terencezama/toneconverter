@@ -83,8 +83,7 @@ export async function POST(req: Request) {
     const suggestion =
       raw.suggestion &&
       typeof raw.suggestion.label === "string" &&
-      typeof raw.suggestion.tone === "string" &&
-      VALID_TONES.has(raw.suggestion.tone)
+      isToneId(raw.suggestion.tone)
         ? { label: raw.suggestion.label, tone: raw.suggestion.tone }
         : null;
 
