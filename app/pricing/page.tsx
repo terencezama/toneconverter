@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free, Pro, and Team Plans",
+  title: "Pricing | Free, Pro, and Team Plans",
   description:
     "Tone Converter pricing: start free, upgrade to Pro for higher limits, or choose Team for your whole organization.",
   alternates: { canonical: "/pricing" },

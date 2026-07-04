@@ -13,7 +13,7 @@ const TONE_LABELS = Object.fromEntries(TONES.map((t) => [t.id, t.label])) as Rec
   string
 >;
 
-/** 3D robot overlay — always visible beside the converter card. */
+/** 3D robot overlay - always visible beside the converter card. */
 export function ConverterRobotAside({
   emotion,
   tone,

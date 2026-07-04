@@ -15,12 +15,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default:
-      "Tone Converter — Convert Angry, Casual or Messy Text into Professional Writing",
+    default: "Free Tone Converter | Rewrite Angry or Messy Text Professionally",
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Use our free Tone Converter to rewrite angry, casual, messy, or unclear messages into polite, professional, friendly, and clear communication in seconds.",
+    "Rewrite angry, casual or unclear messages into polite, professional text. Free tone converter for emails, chat and anything else you have to send.",
   openGraph: {
     siteName: SITE_NAME,
     type: "website",

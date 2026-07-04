@@ -9,10 +9,9 @@ import { TONES } from "@/lib/tones";
 import { USE_CASES } from "@/lib/use-cases";
 
 export const metadata: Metadata = {
-  title:
-    "Tone Converter — Convert Angry, Casual or Messy Text into Professional Writing",
+  title: "Free Tone Converter | Rewrite Angry or Messy Text Professionally",
   description:
-    "Use our free Tone Converter to rewrite angry, casual, messy, or unclear messages into polite, professional, friendly, and clear communication in seconds.",
+    "Rewrite angry, casual or unclear messages into polite, professional text. Free tone converter for emails, chat and anything else you have to send.",
   alternates: { canonical: "/" },
 };
 
@@ -28,7 +27,7 @@ function JsonLd() {
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "Web",
       description:
-        "Free Tone Converter that rewrites angry, casual, messy, or unclear messages into polite, professional, friendly, and clear communication in seconds.",
+        "Free tone converter that rewrites angry, casual or unclear messages into polite, professional text.",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
@@ -64,27 +63,27 @@ export default function HomePage() {
           {[
             {
               title: "Convert Angry Messages into Professional Text",
-              body: "Messages written in anger can damage relationships, offend clients, and create unnecessary conflict. Paste your frustrated draft and Tone Converter rewrites it into calm, polite, professional language — without losing the point you wanted to make.",
+              body: "A message written in anger can cost you a client or a working relationship. Paste the frustrated draft and get back a version that makes the same point without the heat.",
               href: "/angry-to-professional",
               cta: "Try the Angry to Professional Converter",
             },
             {
               title: "Rewrite Casual Text into Formal Communication",
-              body: "Turn relaxed, informal writing into business-ready communication. Perfect for emails, job applications, official requests, and any message where a professional first impression matters.",
+              body: "Turn relaxed, informal writing into something you can put in front of a hiring manager or a client. Useful for job applications, official requests, and first emails to people you don't know yet.",
               href: "/casual-to-formal",
-              cta: "Try the Casual to Formal Converter",
+              cta: "Open the Casual to Formal Converter",
             },
             {
               title: "Make Messy Sentences Clear and Easy to Understand",
-              body: "Rushed, rambling, or confusing text creates misunderstandings and follow-up questions. The clarity mode restructures your writing so your main point comes through immediately.",
+              body: "Rushed, rambling text breeds misunderstandings and follow-up questions. Clarity mode restructures your writing so the main point lands first.",
               href: "/sentence-clarifier",
               cta: "Try the Sentence Clarifier",
             },
             {
               title: "Choose the Right Tone for Every Message",
-              body: `Rewrite the same message in different styles — ${TONES.map((t) => t.label.toLowerCase()).join(", ")} — until it sounds exactly the way you intend. The meaning stays the same; only the tone changes.`,
+              body: `Rewrite the same message as ${TONES.map((t) => t.label.toLowerCase()).join(", ")} until it sounds the way you intend. What you're saying stays the same; how it sounds changes.`,
               href: "/message-tone-changer",
-              cta: "Try the Message Tone Changer",
+              cta: "Open the Message Tone Changer",
             },
           ].map((item) => (
             <div key={item.href} className="glass rounded-3xl p-7">
@@ -114,9 +113,9 @@ export default function HomePage() {
               get a polished version in seconds.
             </p>
             <p className="leading-relaxed">
-              <strong className="text-white">Sound more human.</strong> Make
-              AI-assisted writing sound more natural, clear, and human — the way
-              you would actually say it.
+              <strong className="text-white">Sound more human.</strong> Take
+              AI-assisted writing and make it read the way you would actually
+              say it.
             </p>
           </div>
         </div>
@@ -131,12 +130,12 @@ export default function HomePage() {
               style={{ background: "var(--emotion-b)" }}
             />
             <h2 className="text-2xl font-bold text-white">
-              Everywhere you write — like Grammarly, but with feelings
+              Like Grammarly, but with feelings
             </h2>
             <p className="mt-3 leading-relaxed text-zinc-300">
-              The Tone Converter browser extension lives in your email and every
-              text field on the web. It senses the emotion of what you paste and
-              proposes a better version before you hit send.
+              The browser extension lives in your email and every text field on
+              the web. It senses the emotion of what you paste and proposes a
+              better version before you hit send.
             </p>
             <div className="mt-5 flex flex-wrap gap-2 text-sm font-semibold text-zinc-200">
               <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5">Chrome</span>

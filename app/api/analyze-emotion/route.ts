@@ -17,7 +17,7 @@ Reply with ONLY a JSON object with these exact keys:
   "messiness": number 0..1 (how unstructured, rambling, or chaotic the writing is),
   "detectedTones": array of 0-3 tone ids from ${JSON.stringify([...VALID_TONES])} that the text currently reads as (e.g. "professional", "casual", "confident"),
   "primaryTone": dominant tone id from that list, or null,
-  "summary": short empathetic read max 14 words, e.g. "This reads angry — try Professional or Calm.",
+  "summary": short empathetic read max 14 words, plain punctuation only (no em dashes), e.g. "This reads angry. Try Professional or Calm.",
   "suggestion": null, or { "label": short call-to-action max 5 words e.g. "Make it professional", "tone": one of ${JSON.stringify([...VALID_TONES])} }
 }
 Angry/frustrated text should suggest professional, calm, or polite tones. Messy text should suggest clearer.

@@ -3,9 +3,9 @@ import Link from "next/link";
 import { OriginalityChecker } from "@/components/OriginalityChecker";
 
 export const metadata: Metadata = {
-  title: "AI Originality Checker — Detect AI-Written and Generic Text",
+  title: "AI Originality Checker | Detect AI-Written and Generic Text",
   description:
-    "Free AI originality checker: paste any text to score AI-likelihood and originality, with flagged passages explaining what gives it away.",
+    "Free AI originality checker. Paste any text to score AI-likelihood and originality, with flagged passages explaining what gives it away.",
   alternates: { canonical: "/originality-checker" },
 };
 
@@ -51,8 +51,8 @@ export default function OriginalityCheckerPage() {
           <div className="glass rounded-3xl p-6">
             <h2 className="text-lg font-bold text-white">Flagged passages</h2>
             <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-              See exactly which sentences read as AI patterns or boilerplate — and
-              fix them with the{" "}
+              See which sentences read as AI patterns or boilerplate, then fix
+              them with the{" "}
               <Link href="/#converter" className="text-gradient-live font-semibold">
                 Tone Converter
               </Link>

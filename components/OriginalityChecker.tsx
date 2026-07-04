@@ -118,7 +118,7 @@ export function OriginalityChecker({
   text: controlledText,
   onTextChange,
 }: {
-  /** Render inside ToneConverter tab — no duplicate card wrapper. */
+  /** Render inside ToneConverter tab - no duplicate card wrapper. */
   embedded?: boolean;
   text?: string;
   onTextChange?: (value: string) => void;
@@ -189,7 +189,7 @@ export function OriginalityChecker({
       )}
       <div className="mt-2 flex items-center justify-between">
         <p className="text-xs text-zinc-500">
-          {tooShort ? "Keep going — 80+ characters needed." : embedded ? "Uses the text above." : "\u00A0"}
+          {tooShort ? "Keep going, 80+ characters needed." : embedded ? "Uses the text above." : "\u00A0"}
         </p>
         <p className="text-xs text-zinc-500">
           {text.length} / {MAX_CHARS}
@@ -283,7 +283,7 @@ export function OriginalityChecker({
           )}
 
           <p className="mt-6 text-center text-xs text-zinc-500">
-            Stylistic AI analysis by our language model — not a web-crawl
+            Stylistic analysis by a language model. This is not a web-crawl
             plagiarism database comparison.
           </p>
         </div>

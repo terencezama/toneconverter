@@ -218,16 +218,16 @@ export function HeroSection({ children }: { children: ReactNode }) {
           </h1>
 
           <p ref={subRef} className="hero-sub mt-5 text-lg text-zinc-300">
-            Paste anything — the page reads the emotion in your writing and the world
-            around it reacts. Then convert angry, casual, or messy text into clear,
-            polite, professional messages instantly.
+            Paste anything. The page reads the emotion in your writing and the
+            world around it reacts. Then convert angry, casual, or messy text
+            into clear, professional messages.
           </p>
 
           <p ref={sub2Ref} className="hero-sub mt-2 text-sm font-medium text-zinc-400">
             <span className="hero-text-fill hero-text-fill--brand">
               Tone Convert
-            </span>{" "}
-            — rewrite before you regret send.
+            </span>
+            : rewrite before you regret send.
           </p>
 
           <p

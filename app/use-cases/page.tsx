@@ -3,7 +3,7 @@ import Link from "next/link";
 import { USE_CASES } from "@/lib/use-cases";
 
 export const metadata: Metadata = {
-  title: "Use Cases — Tone Conversion Tools for Every Message",
+  title: "Use Cases | Tone Conversion Tools for Every Message",
   description:
     "Explore all Tone Converter use cases: angry to professional, casual to formal, sentence clarifier, email tone converter, and more free tools.",
   alternates: { canonical: "/use-cases" },

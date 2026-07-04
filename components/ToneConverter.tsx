@@ -189,7 +189,7 @@ export function ToneConverter({
             value={text}
             onChange={(e) => handleChange(e.target.value)}
             onPaste={handlePaste}
-            placeholder="Paste your message here — I'll feel it as you type..."
+            placeholder="Paste your message here. I'll feel it as you type..."
             rows={6}
             className={`glass-input w-full resize-y rounded-2xl p-4 pb-16 pr-16 text-base text-zinc-100 placeholder:text-zinc-500 transition-all duration-500 sm:pb-[4.25rem] sm:pr-[4.5rem] ${
               loading

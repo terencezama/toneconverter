@@ -4,7 +4,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "What is a tone converter?",
     answer:
-      "A tone converter is a tool that rewrites text in a different tone, such as professional, friendly, polite, formal, casual, or calm — while keeping the original meaning of your message.",
+      "A tone converter is a tool that rewrites text in a different tone (professional, friendly, formal, casual, calm, and so on) while keeping the original meaning of your message.",
   },
   {
     question: "Can I convert angry messages into polite messages?",
@@ -29,11 +29,11 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Does Tone Converter change the meaning of my message?",
     answer:
-      "No. Tone Converter is designed to preserve your meaning and intent — it only changes how the message sounds, not what it says.",
+      "No. Tone Converter preserves your meaning and intent. It changes how the message sounds, not what it says.",
   },
   {
     question: "Can it make AI-generated text sound more natural?",
     answer:
-      "Yes. Tone Converter helps make AI-assisted writing sound more natural, clear, and human, so your messages read the way you actually talk.",
+      "Yes. Run AI-assisted writing through Tone Converter and it will read closer to the way you actually talk.",
   },
 ];

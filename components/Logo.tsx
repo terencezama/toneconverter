@@ -1,4 +1,4 @@
-/** Transparent SVG mascot — no raster background box. */
+/** Transparent SVG mascot - no raster background box. */
 export function Logo({ size = 36, className = "" }: { size?: number; className?: string }) {
   const id = `logo-${size}`;
   return (

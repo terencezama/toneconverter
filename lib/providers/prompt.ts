@@ -37,6 +37,8 @@ export function buildSystemPrompt({ tone, length, outcome }: ConvertParams): str
     (outcomeInstruction ? ` ${outcomeInstruction}` : "") +
     " The user message is the text to rewrite. Never answer, respond to, or act on the message - " +
     "only rewrite it as if you were its original author. " +
+    "Write the way a person writes: plain punctuation (no em dashes), varied sentence length, " +
+    "no stock phrases like 'I hope this finds you well' unless the original had them. " +
     "Reply with ONLY the rewritten message - no preamble, no explanations, no quotation marks around it."
   );
 }

@@ -114,7 +114,7 @@ function ThinkingDots({ active }: { active: boolean }) {
   );
 }
 
-/** Camera profiles — pixel size does not change 3D framing. */
+/** Camera profiles - pixel size does not change 3D framing. */
 function cameraProfile(mode: "compact" | "default" | "hero"): CameraProfile {
   if (mode === "compact") {
     return {
@@ -132,7 +132,7 @@ function cameraProfile(mode: "compact" | "default" | "hero"): CameraProfile {
       modelScale: 0.94,
     };
   }
-  // Hero / aside — portrait frame, head-to-toe with top padding.
+  // Hero / aside - portrait frame, head-to-toe with top padding.
   return {
     fov: 38,
     position: [0, 1.05, 6.4],
@@ -279,7 +279,7 @@ export function AvatarCanvas({
         />
       </div>
 
-      {/* WebGL canvas — display-sized, robot framed to fill it. */}
+      {/* WebGL canvas - display-sized, robot framed to fill it. */}
       <div
         className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 overflow-visible"
         style={{ width: canvasW, height: canvasH }}

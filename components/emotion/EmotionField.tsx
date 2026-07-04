@@ -72,7 +72,7 @@ const FRAGMENT = /* glsl */ `
     vec2 p = vec2(uv.x * aspect, uv.y);
     float t = uTime * uSpeed;
 
-    // Subtle glitch — only at high messiness, heavily damped.
+    // Subtle glitch - only at high messiness, heavily damped.
     if (uGlitch > 0.08) {
       float band = floor(uv.y * mix(28.0, 10.0, uGlitch));
       float jitter = sin(band * 1.7 + t * 2.0) * uGlitch * 0.04;

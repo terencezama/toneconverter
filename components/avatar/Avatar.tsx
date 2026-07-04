@@ -43,7 +43,7 @@ export function Avatar({
   largeCanvas = false,
 }: {
   mood?: EmotionPalette["mood"];
-  /** Selected or detected writing tone — drives emote animations and expression blend. */
+  /** Selected or detected writing tone - drives emote animations and expression blend. */
   tone?: ToneId | null;
   thinking?: boolean;
   size?: number;
@@ -52,7 +52,7 @@ export function Avatar({
   className?: string;
   /** Skip WebGL and render the SVG fallback. */
   forceSvg?: boolean;
-  /** Bigger internal canvas scaled down — avoids cropping the 3D robot. */
+  /** Bigger internal canvas scaled down - avoids cropping the 3D robot. */
   largeCanvas?: boolean;
 }) {
   const [renderMode, setRenderMode] = useState<"pending" | "svg" | "webgl">("pending");

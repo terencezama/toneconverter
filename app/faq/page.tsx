@@ -4,7 +4,7 @@ import { FaqAccordion } from "@/components/FaqAccordion";
 import { FAQ_ITEMS } from "@/lib/faq";
 
 export const metadata: Metadata = {
-  title: "FAQ — Tone Converter Questions Answered",
+  title: "Tone Converter FAQ",
   description:
     "Answers to common questions about Tone Converter: what it does, how to convert angry messages into polite ones, make writing clearer, and more.",
   alternates: { canonical: "/faq" },

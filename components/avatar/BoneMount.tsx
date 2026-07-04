@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
-/** Mount children on a skeleton bone — works reliably without createPortal. */
+/** Mount children on a skeleton bone - works reliably without createPortal. */
 export function BoneMount({
   bone,
   position = [0, 0, 0],

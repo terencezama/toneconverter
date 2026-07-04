@@ -27,7 +27,7 @@ type ToneAction = (tone: string) => void;
 
 type EmotionContextValue = {
   state: EmotionState;
-  /** Instant read from heuristics — appears before the LLM responds. */
+  /** Instant read from heuristics - appears before the LLM responds. */
   quickRead: ReturnType<typeof quickRead>;
   analysis: EmotionAnalysis | null;
   analyzing: boolean;
@@ -47,7 +47,7 @@ const EmotionContext = createContext<EmotionContextValue | null>(null);
 const DEEP_ANALYSIS_MIN_CHARS = 12;
 /** How long to wait after the last keystroke before mood / tones update. */
 const MOOD_DEBOUNCE_MS = 650;
-/** LLM refinement — runs after mood has had time to settle. */
+/** LLM refinement - runs after mood has had time to settle. */
 const DEEP_DEBOUNCE_MS = 950;
 const STRONG_SIGNAL_INTENSITY = 0.32;
 
