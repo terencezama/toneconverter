@@ -1,1 +1,1 @@
-export * from "../../../shared/emotion/quickRead";
+export * from "@shared/emotion/quickRead";

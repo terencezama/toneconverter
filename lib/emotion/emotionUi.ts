@@ -1,1 +1,1 @@
-export * from "../../../shared/emotion/emotionUi";
+export * from "@shared/emotion/emotionUi";

@@ -1,4 +1,4 @@
-import type { LengthId, OutcomeId, ToneId } from "../../../shared/tones";
+import type { LengthId, OutcomeId, ToneId } from "@shared/tones";
 
 export type ConvertParams = {
   text: string;

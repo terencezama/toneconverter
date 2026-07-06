@@ -1,1 +1,1 @@
-export * from "../../../shared/emotion/palette";
+export * from "@shared/emotion/palette";

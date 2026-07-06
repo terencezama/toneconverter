@@ -1,1 +1,1 @@
-export * from "../../../shared/emotion/heuristic";
+export * from "@shared/emotion/heuristic";
