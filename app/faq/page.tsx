@@ -4,9 +4,9 @@ import { FaqAccordion } from "@/components/FaqAccordion";
 import { FAQ_ITEMS } from "@/lib/faq";
 
 export const metadata: Metadata = {
-  title: "Tone Converter FAQ",
+  title: "FAQ",
   description:
-    "Answers to common questions about Tone Converter: what it does, how to convert angry messages into polite ones, make writing clearer, and more.",
+    "Answers to common questions about Poise: what it does, how to convert angry messages into polite ones, make writing clearer, and more.",
   alternates: { canonical: "/faq" },
 };
 
@@ -30,23 +30,25 @@ function FaqJsonLd() {
 
 export default function FaqPage() {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <section className="mx-auto max-w-[820px] px-5 py-20 sm:px-8">
       <FaqJsonLd />
-      <h1 className="text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-        Frequently Asked Questions
+      <h1
+        className="mb-10 mt-0 text-center font-serif text-ink"
+        style={{
+          fontSize: "clamp(30px, 4vw, 46px)",
+          lineHeight: 1.05,
+          letterSpacing: "-0.01em",
+        }}
+      >
+        Questions, answered.
       </h1>
-      <p className="mt-4 text-center text-lg text-zinc-300">
-        Everything you need to know about Tone Converter.
-      </p>
-      <div className="mt-10">
-        <FaqAccordion items={FAQ_ITEMS} />
-      </div>
-      <div className="mt-10 text-center">
+      <FaqAccordion items={FAQ_ITEMS} />
+      <div className="mt-12 text-center">
         <Link
           href="/#converter"
-          className="btn-gradient inline-block rounded-xl px-8 py-3 text-base font-semibold"
+          className="btn-accent inline-block px-8 py-4 text-base leading-none"
         >
-          Try the Tone Converter
+          Convert a message →
         </Link>
       </div>
     </section>

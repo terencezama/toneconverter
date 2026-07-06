@@ -1,25 +1,37 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { EmotionFieldLoader } from "@/components/emotion/EmotionFieldLoader";
 import { EmotionProvider } from "@/components/emotion/EmotionProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
-const inter = Inter({
-  variable: "--font-inter",
+const hanken = Hanken_Grotesk({
+  variable: "--font-hanken",
   subsets: ["latin"],
+});
+
+const instrument = Instrument_Serif({
+  variable: "--font-instrument",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jbmono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Free Tone Converter | Rewrite Angry or Messy Text Professionally",
+    default: "Poise | Rewrite Angry or Messy Text into Professional Messages",
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Rewrite angry, casual or unclear messages into polite, professional text. Free tone converter for emails, chat and anything else you have to send.",
+    "Poise reads the heat in your draft and rewrites angry, casual or unclear messages into clear, professional text. Write it raw. Send it with poise.",
   openGraph: {
     siteName: SITE_NAME,
     type: "website",
@@ -38,14 +50,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${hanken.variable} ${instrument.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
       <body className="flex min-h-screen flex-col">
         <EmotionProvider>
-          <EmotionFieldLoader />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
         </EmotionProvider>
+        <div className="grain" aria-hidden />
       </body>
     </html>
   );

@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
-import { analyzeHeuristic } from "@/lib/emotion/heuristic";
-import type { EmotionState } from "@/lib/emotion/types";
 import { readJsonResponse } from "@/lib/fetchJson";
+import { moodReading, MOOD_DEFAULT_COLOR } from "@/lib/mood";
 import {
   LENGTHS,
   MAX_CHARS,
@@ -14,24 +13,26 @@ import {
   type OutcomeId,
   type ToneId,
 } from "@/lib/tones";
-import { AssistantBubble } from "./avatar/AssistantBubble";
-import { ConverterRobotAside } from "./avatar/ConverterRobotAside";
 import { useEmotion } from "./emotion/EmotionProvider";
-import { OriginalityChecker } from "./OriginalityChecker";
-import { OutputCard } from "./OutputCard";
 
 type ProviderInfo = { id: string; label: string };
 
-const EMOTION_LABELS: Record<string, string> = {
-  neutral: "Neutral",
-  angry: "Angry",
-  frustrated: "Frustrated",
-  anxious: "Anxious",
-  sad: "Sad",
-  excited: "Excited",
-  happy: "Happy",
-  calm: "Calm",
-};
+/** Tones shown as chips; the rest stay reachable through length options. */
+const CHIP_TONES: ToneId[] = [
+  "professional",
+  "polite",
+  "friendly",
+  "calm",
+  "formal",
+  "confident",
+  "empathetic",
+  "clearer",
+];
+
+const LENGTH_ORDER: LengthId[] = ["shorter", "normal", "longer"];
+
+const EXAMPLE_TEXT =
+  "are you serious?? this is the THIRD time the report is late and NOBODY bothered to tell me. i'm honestly done covering for this team, figure it out.";
 
 export function ToneConverter({
   defaultTone = "professional",
@@ -45,15 +46,11 @@ export function ToneConverter({
   const [providers, setProviders] = useState<ProviderInfo[]>([]);
   const [provider, setProvider] = useState<string>("openai");
   const [result, setResult] = useState<string | null>(null);
-  const [original, setOriginal] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"convert" | "originality">("convert");
+  const [copied, setCopied] = useState(false);
 
-  const { state, feedText, registerToneAction, setConverting, detectedTones, primaryTone } =
-    useEmotion();
-  const [beforeConvertState, setBeforeConvertState] = useState(state);
-  const [afterConvertState, setAfterConvertState] = useState<EmotionState | null>(null);
+  const { state, analysis, feedText, setConverting } = useEmotion();
 
   const textRef = useRef(text);
   const loadingRef = useRef(loading);
@@ -63,6 +60,20 @@ export function ToneConverter({
   useEffect(() => {
     loadingRef.current = loading;
   }, [loading]);
+
+  const hasText = text.trim().length > 0;
+  const mood = moodReading(state, hasText);
+  const moodLabel =
+    hasText && analysis?.summary ? analysis.summary : mood.label;
+
+  // Tint the page glow with the current mood.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--mood", mood.color);
+    return () => {
+      root.style.setProperty("--mood", MOOD_DEFAULT_COLOR);
+    };
+  }, [mood.color]);
 
   useEffect(() => {
     fetch("/api/providers")
@@ -81,17 +92,15 @@ export function ToneConverter({
   }, []);
 
   const convert = useCallback(
-    async (overrides?: { tone?: ToneId; isRegenerate?: boolean }) => {
+    async (overrides?: { isRegenerate?: boolean }) => {
       const currentText = textRef.current;
-      const useTone = overrides?.tone ?? tone;
       if (!currentText.trim() || loadingRef.current) return;
-      setBeforeConvertState(state);
-      setAfterConvertState(null);
       setLoading(true);
       setConverting(true);
       setError(null);
+      setCopied(false);
       trackEvent(overrides?.isRegenerate ? "regenerate" : "convert", {
-        tone: useTone,
+        tone,
         length,
         outcome,
         provider,
@@ -101,298 +110,265 @@ export function ToneConverter({
         const res = await fetch("/api/convert-tone", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: currentText, tone: useTone, length, outcome, provider }),
+          body: JSON.stringify({ text: currentText, tone, length, outcome, provider }),
         });
         const data = await readJsonResponse<{ result?: string; error?: string }>(res);
         if (!res.ok || !data.result) {
           throw new Error(data.error ?? "Something went wrong. Please try again.");
         }
         setResult(data.result);
-        setOriginal(currentText);
-        setAfterConvertState(analyzeHeuristic(data.result));
-        trackEvent("convert_success", { tone: useTone, length, outcome, provider });
+        trackEvent("convert_success", { tone, length, outcome, provider });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong.");
-        trackEvent("convert_error", { tone: useTone, length, outcome, provider });
+        trackEvent("convert_error", { tone, length, outcome, provider });
       } finally {
         setLoading(false);
         setConverting(false);
       }
     },
-    [tone, length, outcome, provider, state, setConverting]
+    [tone, length, outcome, provider, setConverting]
   );
-
-  // Let the assistant avatar trigger conversions ("Make it professional").
-  useEffect(() => {
-    registerToneAction((suggestedTone: string) => {
-      const valid = TONES.find((t) => t.id === suggestedTone);
-      if (!valid) return;
-      setTone(valid.id);
-      void convert({ tone: valid.id });
-    });
-    return () => registerToneAction(null);
-  }, [registerToneAction, convert]);
 
   function handleChange(value: string) {
     const next = value.slice(0, MAX_CHARS);
     setText(next);
     feedText(next);
-    if (result) {
-      setResult(null);
-      setAfterConvertState(null);
-    }
+    if (result) setResult(null);
+    if (error) setError(null);
   }
 
   function handlePaste() {
-    // Read the textarea after the paste has been applied.
     setTimeout(() => feedText(textRef.current, { pasted: true }), 0);
   }
 
-  const charsLeft = MAX_CHARS - text.length;
-  const pinOriginalEmotion = loading || result ? beforeConvertState : null;
-  const robotEmotion = afterConvertState ?? state;
-  const showEmotion =
-    text.trim().length > 0 &&
-    (state.emotion !== "neutral" || state.messiness > 0.35);
+  function loadExample() {
+    setResult(null);
+    setError(null);
+    setCopied(false);
+    setText(EXAMPLE_TEXT);
+    feedText(EXAMPLE_TEXT, { pasted: true });
+  }
+
+  async function copyResult() {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(result);
+      setCopied(true);
+      trackEvent("copy", { tone });
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // Clipboard unavailable (e.g. insecure context); ignore.
+    }
+  }
+
+  const toneLabel = TONES.find((t) => t.id === tone)?.label ?? "Professional";
+  const showEmpty = !result && !loading && !error;
 
   return (
-    <div className="relative mx-auto w-full max-w-3xl overflow-visible">
-      <div className="glass overflow-visible rounded-3xl p-4 shadow-2xl shadow-black/30 sm:p-6">
-        <div className="mb-4 flex gap-2 rounded-2xl border border-white/10 bg-black/20 p-1">
-          {(
-            [
-              { id: "convert" as const, label: "Convert Tone" },
-              { id: "originality" as const, label: "AI Checker" },
-            ] as const
-          ).map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setTab(item.id)}
-              className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
-                tab === item.id
-                  ? "btn-gradient"
-                  : "text-zinc-400 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        <label htmlFor="tone-input" className="sr-only">
-          Your message
-        </label>
-        <div className="relative">
-          <textarea
-            id="tone-input"
-            value={text}
-            onChange={(e) => handleChange(e.target.value)}
-            onPaste={handlePaste}
-            placeholder="Paste your message here. I'll feel it as you type..."
-            rows={6}
-            className={`glass-input w-full resize-y rounded-2xl p-4 pb-16 pr-16 text-base text-zinc-100 placeholder:text-zinc-500 transition-all duration-500 sm:pb-[4.25rem] sm:pr-[4.5rem] ${
-              loading
-                ? "animate-convert-pulse ring-2 ring-[color-mix(in_srgb,var(--emotion-c)_45%,transparent)]"
-                : ""
-            }`}
-          />
-          <AssistantBubble anchored emotionOverride={pinOriginalEmotion} />
-          {loading && (
-            <div
-              className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/[0.04] to-transparent"
-              style={{ animation: "shimmer 1.6s ease-in-out infinite" }}
-              aria-hidden
-            />
-          )}
-        </div>
-
-        <div className="mt-2 flex items-center justify-between gap-3">
-          {/* Live emotion meter */}
-          <div
-            className={`flex items-center gap-2 text-xs transition-opacity duration-150 ${
-              showEmotion ? "opacity-100" : "opacity-0"
-            }`}
-            aria-live="polite"
-          >
-            <span
-              className="h-2.5 w-2.5 rounded-full"
-              style={{
-                background:
-                  "linear-gradient(120deg, var(--emotion-a), var(--emotion-c))",
-                boxShadow: "0 0 10px var(--emotion-b)",
-                animation: "pulse-glow 2s ease-in-out infinite",
-              }}
-            />
-            <span className="font-medium text-zinc-300">
-              {state.emotion !== "neutral"
-                ? `Feels ${EMOTION_LABELS[state.emotion]?.toLowerCase()}`
-                : "Feels a bit messy"}
-            </span>
-            {state.messiness > 0.5 && (
-              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
-                a bit messy
+    <div className="w-full">
+      <div
+        className="surface overflow-hidden rounded-[22px]"
+        style={{
+          boxShadow:
+            "0 1px 0 rgba(33,29,23,.04), 0 24px 60px -40px rgba(33,29,23,.4)",
+        }}
+      >
+        <div className="grid md:grid-cols-2">
+          <div className="border-b border-line p-6 sm:p-7 md:border-b-0 md:border-r">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="eyebrow-sm text-raw" style={{ letterSpacing: "0.14em" }}>
+                Your message
               </span>
-            )}
-            {detectedTones.length > 0 && (
-              <span className="text-zinc-500">·</span>
-            )}
-            {detectedTones.slice(0, 2).map((t) => (
+              <span className="font-mono text-[13px] leading-none text-ink-soft">
+                {text.length} / {MAX_CHARS}
+              </span>
+            </div>
+
+            <div className="mb-4 flex min-h-4 items-center gap-2" aria-live="polite">
               <span
-                key={t}
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
-                  tone === t || primaryTone === t
-                    ? "btn-gradient"
-                    : "border border-white/15 bg-white/5 text-zinc-400"
-                }`}
+                className="h-[9px] w-[9px] shrink-0 rounded-full transition-colors duration-500"
+                style={{
+                  background: mood.color,
+                  boxShadow: `0 0 0 4px ${mood.color}22`,
+                }}
+              />
+              <span
+                className="text-[13px] font-medium leading-none transition-colors duration-500"
+                style={{ color: mood.color }}
               >
-                {TONES.find((x) => x.id === t)?.label ?? t}
+                {moodLabel}
               </span>
-            ))}
+            </div>
+
+            <label htmlFor="tone-input" className="sr-only">
+              Your message
+            </label>
+            <textarea
+              id="tone-input"
+              value={text}
+              onChange={(e) => handleChange(e.target.value)}
+              onPaste={handlePaste}
+              maxLength={MAX_CHARS}
+              placeholder="Paste the message you're about to send, however it comes out. e.g. “are you kidding me, this is the THIRD time you've missed the deadline and nobody said a word…”"
+              className="min-h-[210px] w-full resize-y border-none bg-transparent text-[17px] leading-relaxed text-ink placeholder:text-[#b9b1a2]"
+            />
           </div>
 
-          <div
-            className={`text-right text-xs ${
-              charsLeft < 100 ? "text-amber-400" : "text-zinc-500"
-            }`}
-          >
-            {text.length} / {MAX_CHARS}
+          <div className="bg-paper p-6 sm:p-7">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <span className="eyebrow-sm text-accent" style={{ letterSpacing: "0.14em" }}>
+                Composed · {toneLabel}
+              </span>
+              {result && !loading && (
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={copyResult} className="chip-action">
+                    {copied ? "Copied ✓" : "Copy"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => convert({ isRegenerate: true })}
+                    className="chip-action"
+                  >
+                    Again
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {showEmpty && (
+              <p className="m-0 max-w-[40ch] text-[17px] leading-relaxed text-[#b9b1a2]">
+                Your rewritten message appears here. Same meaning, composed
+                tone, ready to send.
+              </p>
+            )}
+            {loading && (
+              <div className="flex items-center gap-2.5">
+                <span
+                  className="h-2 w-2 rounded-full bg-accent"
+                  style={{ animation: "pulseDot 1s infinite" }}
+                />
+                <span className="text-base leading-none text-ink-soft">
+                  Composing a calmer version…
+                </span>
+              </div>
+            )}
+            {result && !loading && (
+              <p className="animate-panel-in m-0 whitespace-pre-wrap text-[17px] leading-relaxed text-ink">
+                {result}
+              </p>
+            )}
+            {error && !loading && (
+              <p role="alert" className="m-0 text-[15px] leading-normal text-raw">
+                {error}
+              </p>
+            )}
           </div>
         </div>
 
-        {tab === "convert" ? (
-          <>
-            <div className="mt-3">
-              <p className="mb-2 text-sm font-medium text-zinc-300">Choose a tone</p>
-              <div className="flex flex-wrap gap-2">
-                {TONES.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTone(t.id)}
-                    className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
-                      tone === t.id
-                        ? "btn-gradient"
-                        : "border border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <label htmlFor="length-select" className="text-sm text-zinc-400">
-                    Length
-                  </label>
-                  <select
-                    id="length-select"
-                    value={length}
-                    onChange={(e) => setLength(e.target.value as LengthId)}
-                    className="glass-input rounded-lg px-2.5 py-1.5 text-sm text-zinc-200 [&>option]:bg-zinc-900"
-                  >
-                    {LENGTHS.map((l) => (
-                      <option key={l.id} value={l.id}>
-                        {l.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <label htmlFor="outcome-select" className="text-sm text-zinc-400">
-                    Goal
-                  </label>
-                  <select
-                    id="outcome-select"
-                    value={outcome ?? ""}
-                    onChange={(e) =>
-                      setOutcome(e.target.value ? (e.target.value as OutcomeId) : null)
-                    }
-                    className="glass-input rounded-lg px-2.5 py-1.5 text-sm text-zinc-200 [&>option]:bg-zinc-900"
-                  >
-                    <option value="">None</option>
-                    {OUTCOMES.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {providers.length > 1 && (
-                  <div className="flex items-center gap-2">
-                    <label htmlFor="provider-select" className="text-sm text-zinc-400">
-                      Engine
-                    </label>
-                    <select
-                      id="provider-select"
-                      value={provider}
-                      onChange={(e) => setProvider(e.target.value)}
-                      className="glass-input rounded-lg px-2.5 py-1.5 text-sm text-zinc-200 [&>option]:bg-zinc-900"
+        <div className="flex flex-wrap items-end justify-between gap-6 border-t border-line p-5 sm:px-7">
+          <div className="flex flex-wrap gap-6">
+            <div>
+              <div className="eyebrow-sm mb-2.5 text-ink-soft">Tone</div>
+              <div className="flex max-w-[520px] flex-wrap gap-2">
+                {CHIP_TONES.map((id) => {
+                  const t = TONES.find((item) => item.id === id);
+                  if (!t) return null;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTone(t.id)}
+                      className={`chip ${tone === t.id ? "chip-active-accent" : ""}`}
                     >
-                      {providers.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                      {t.label}
+                    </button>
+                  );
+                })}
               </div>
-
-              <button
-                type="button"
-                onClick={() => convert()}
-                disabled={!text.trim() || loading}
-                className="btn-gradient inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-base font-semibold"
-              >
-                {loading && (
-                  <span
-                    className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-                    aria-hidden
-                  />
-                )}
-                {loading ? "Converting..." : "Convert Tone"}
-              </button>
             </div>
 
-            {error && (
-              <div
-                role="alert"
-                className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+            <div>
+              <div className="eyebrow-sm mb-2.5 text-ink-soft">Length</div>
+              <div className="flex gap-2">
+                {LENGTH_ORDER.map((id) => {
+                  const l = LENGTHS.find((item) => item.id === id);
+                  if (!l) return null;
+                  return (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => setLength(l.id)}
+                      className={`chip ${length === l.id ? "chip-active-ink" : ""}`}
+                    >
+                      {l.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <div className="eyebrow-sm mb-2.5 text-ink-soft">Goal</div>
+              <select
+                value={outcome ?? ""}
+                onChange={(e) =>
+                  setOutcome(e.target.value ? (e.target.value as OutcomeId) : null)
+                }
+                aria-label="Goal"
+                className="chip appearance-none pr-6"
               >
-                {error}
+                <option value="">None</option>
+                {OUTCOMES.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {providers.length > 1 && (
+              <div>
+                <div className="eyebrow-sm mb-2.5 text-ink-soft">Engine</div>
+                <select
+                  value={provider}
+                  onChange={(e) => setProvider(e.target.value)}
+                  aria-label="Engine"
+                  className="chip appearance-none pr-6"
+                >
+                  {providers.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
-          </>
-        ) : (
-          <OriginalityChecker embedded text={text} onTextChange={handleChange} />
-        )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={loadExample}
+              className="btn-outline px-5 py-[13px] text-[15px] leading-none"
+            >
+              Try an example
+            </button>
+            <button
+              type="button"
+              onClick={() => convert()}
+              disabled={!hasText || loading}
+              className="btn-accent flex items-center gap-2 px-7 py-3.5 text-base leading-none"
+            >
+              {loading ? "Composing" : "Convert"}
+              <span className="text-lg leading-none">→</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <ConverterRobotAside
-        emotion={robotEmotion}
-        tone={tone}
-        loading={loading}
-      />
-
-      {tab === "convert" && result && (
-        <OutputCard
-          original={original}
-          result={result}
-          tone={tone}
-          length={length}
-          outcome={outcome}
-          loading={loading}
-          beforeEmotion={beforeConvertState}
-          afterEmotion={afterConvertState}
-          onRegenerate={() => convert({ isRegenerate: true })}
-        />
-      )}
+      <p className="mt-5 text-center text-sm text-ink-soft">
+        Free to try · No account · Your text is never stored
+      </p>
     </div>
   );
 }

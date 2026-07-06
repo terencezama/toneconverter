@@ -32,13 +32,24 @@ export default async function UseCasePage({ params }: Props) {
 
   return (
     <>
-      <section>
-        <div className="mx-auto max-w-6xl px-4 pb-14 pt-14 sm:px-6">
+      <div className="mood-glow" aria-hidden />
+      <section className="relative z-[1]">
+        <div className="mx-auto max-w-[1160px] px-5 pb-14 pt-14 sm:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h1
+              className="m-0 font-serif text-ink"
+              style={{
+                fontSize: "clamp(34px, 5vw, 56px)",
+                lineHeight: 1.02,
+                letterSpacing: "-0.01em",
+                textWrap: "balance",
+              }}
+            >
               {useCase.h1}
             </h1>
-            <p className="mt-4 text-lg text-zinc-300">{useCase.intro}</p>
+            <p className="mb-0 mt-5 text-lg leading-relaxed text-ink-soft">
+              {useCase.intro}
+            </p>
           </div>
           <div className="mt-10" id="converter">
             <ToneConverter defaultTone={useCase.presetTone} />
@@ -46,52 +57,55 @@ export default async function UseCasePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <section className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
         {useCase.body.map((paragraph) => (
-          <p key={paragraph.slice(0, 40)} className="mb-4 leading-relaxed text-zinc-300">
+          <p
+            key={paragraph.slice(0, 40)}
+            className="mb-4 text-[17px] leading-relaxed text-ink-soft"
+          >
             {paragraph}
           </p>
         ))}
 
-        <h2 className="mt-10 text-xl font-bold text-white">Example</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="glass rounded-2xl p-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-              Before
-            </p>
-            <p className="text-sm leading-relaxed text-zinc-300">
+        <h2 className="mb-0 mt-12 font-serif text-[28px] leading-tight text-ink">
+          Example
+        </h2>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-line bg-paper p-5">
+            <p className="eyebrow-sm mb-2.5 text-raw">Before</p>
+            <p className="m-0 text-[15px] leading-relaxed text-ink-soft">
               {useCase.example.before}
             </p>
           </div>
-          <div className="glass rounded-2xl border-white/20 p-4">
-            <p className="text-gradient-live mb-2 text-xs font-semibold uppercase tracking-wide">
-              After
-            </p>
-            <p className="text-sm leading-relaxed text-zinc-100">
+          <div className="surface rounded-2xl p-5">
+            <p className="eyebrow-sm mb-2.5 text-accent">After</p>
+            <p className="m-0 text-[15px] leading-relaxed text-ink">
               {useCase.example.after}
             </p>
           </div>
         </div>
 
-        <div className="glass mt-10 rounded-3xl p-6 text-center">
-          <p className="text-zinc-300">
+        <div className="surface mt-10 rounded-2xl p-6 text-center">
+          <p className="m-0 text-ink-soft">
             Need a different tone? Try the full{" "}
-            <Link href="/" className="text-gradient-live font-semibold">
-              Tone Converter
+            <Link href="/#converter" className="font-semibold text-accent hover:text-accent-strong">
+              converter
             </Link>{" "}
             with all tone and length options.
           </p>
         </div>
 
-        <h2 className="mt-12 text-xl font-bold text-white">Related tools</h2>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+        <h2 className="mb-0 mt-12 font-serif text-[28px] leading-tight text-ink">
+          Related tools
+        </h2>
+        <ul className="mt-5 grid list-none gap-3 p-0 sm:grid-cols-2">
           {others.map((other) => (
             <li key={other.slug}>
               <Link
                 href={`/${other.slug}`}
-                className="glass block rounded-2xl p-4 font-medium text-zinc-100 transition-colors hover:bg-white/10"
+                className="surface block rounded-2xl p-4 font-medium text-ink transition-colors hover:border-accent"
               >
-                {other.navLabel}
+                {other.navLabel} →
               </Link>
             </li>
           ))}

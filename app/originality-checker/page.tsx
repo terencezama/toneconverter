@@ -12,18 +12,27 @@ export const metadata: Metadata = {
 export default function OriginalityCheckerPage() {
   return (
     <>
-      <section>
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pt-20">
+      <div className="mood-glow" aria-hidden />
+      <section className="relative z-[1]">
+        <div className="mx-auto max-w-[1160px] px-5 pb-16 pt-14 sm:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="glass mx-auto mb-5 inline-block rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-300">
-              AI Originality Checker
-            </p>
-            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-              Does your text sound <span className="text-gradient-live">like a robot</span>?
+            <span className="eyebrow text-accent">AI originality checker</span>
+            <h1
+              className="mb-0 mt-4 font-serif text-ink"
+              style={{
+                fontSize: "clamp(34px, 5vw, 56px)",
+                lineHeight: 1.02,
+                letterSpacing: "-0.01em",
+                textWrap: "balance",
+              }}
+            >
+              Does your text sound{" "}
+              <em className="italic text-accent">like a robot</em>?
             </h1>
-            <p className="mt-5 text-lg text-zinc-300">
-              Paste any text and our AI scores how AI-generated it reads, how
-              original it is, and highlights exactly which passages give it away.
+            <p className="mx-auto mb-0 mt-5 max-w-[52ch] text-lg leading-relaxed text-ink-soft">
+              Paste any text and Poise scores how AI-generated it reads, how
+              original it is, and highlights exactly which passages give it
+              away.
             </p>
           </div>
           <div className="mt-10">
@@ -32,33 +41,43 @@ export default function OriginalityCheckerPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="glass rounded-3xl p-6">
-            <h2 className="text-lg font-bold text-white">AI-likelihood score</h2>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-              Detects the telltale rhythm of machine writing: uniform sentences,
-              hedging filler, stock transitions, and the absence of a human voice.
-            </p>
-          </div>
-          <div className="glass rounded-3xl p-6">
-            <h2 className="text-lg font-bold text-white">Originality score</h2>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-              Measures how distinctive your writing is versus generic boilerplate
-              anyone could have produced.
-            </p>
-          </div>
-          <div className="glass rounded-3xl p-6">
-            <h2 className="text-lg font-bold text-white">Flagged passages</h2>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-              See which sentences read as AI patterns or boilerplate, then fix
-              them with the{" "}
-              <Link href="/#converter" className="text-gradient-live font-semibold">
-                Tone Converter
-              </Link>
-              .
-            </p>
-          </div>
+      <section className="mx-auto max-w-[1160px] px-5 pb-24 sm:px-8">
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              num: "01",
+              title: "AI-likelihood score",
+              body: "Detects the telltale rhythm of machine writing: uniform sentences, hedging filler, stock transitions, and the absence of a human voice.",
+            },
+            {
+              num: "02",
+              title: "Originality score",
+              body: "Measures how distinctive your writing is versus generic boilerplate anyone could have produced.",
+            },
+            {
+              num: "03",
+              title: "Flagged passages",
+              body: "See which sentences read as AI patterns or boilerplate, then fix them with the converter.",
+            },
+          ].map((item) => (
+            <div key={item.num} className="surface rounded-2xl p-6">
+              <span className="font-mono text-[11px] font-medium leading-none tracking-[0.1em] text-accent">
+                {item.num}
+              </span>
+              <h2 className="mb-2.5 mt-4 font-serif text-[21px] leading-tight text-ink">
+                {item.title}
+              </h2>
+              <p className="m-0 text-sm leading-relaxed text-ink-soft">{item.body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 text-center">
+          <Link
+            href="/#converter"
+            className="text-[15px] font-semibold text-accent hover:text-accent-strong"
+          >
+            Fix flagged text with the converter →
+          </Link>
         </div>
       </section>
     </>

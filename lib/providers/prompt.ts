@@ -1,4 +1,4 @@
-import { instructionForOutcome } from "../../../shared/tones";
+import { instructionForOutcome } from "@shared/tones";
 import type { ConvertParams } from "./types";
 
 const TONE_INSTRUCTIONS: Record<string, string> = {

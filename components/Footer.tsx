@@ -1,72 +1,59 @@
 import Link from "next/link";
-import { Logo } from "@/components/Logo";
 import { USE_CASES } from "@/lib/use-cases";
 
 export function Footer() {
   return (
-    <footer className="glass-strong mt-auto border-x-0 border-b-0">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
+    <footer className="mt-auto border-t border-line">
+      <div className="mx-auto grid max-w-[1160px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.6fr_1fr_1fr]">
         <div>
-          <p className="flex items-center gap-2 text-base font-bold text-white">
-            <Logo size={24} className="shrink-0" />
-            Tone Converter
-          </p>
-          <p className="mt-2 text-sm text-zinc-400">
-            Convert angry, casual, messy, or unclear writing into clear,
-            polite, professional communication. Write it badly. Send it
-            professionally.
+          <Link href="/" className="mb-4 flex items-center gap-2.5">
+            <span className="inline-block h-[11px] w-[11px] rounded-full bg-accent" />
+            <span className="font-serif text-[26px] leading-none text-ink">Poise</span>
+          </Link>
+          <p className="m-0 max-w-[38ch] text-[15px] leading-relaxed text-ink-soft">
+            Rewrite angry, casual, or messy drafts into clear, professional
+            messages. Write it raw. Send it with poise.
           </p>
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-white">Product</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link href="/#converter" className="text-zinc-400 hover:text-white">
-                Tone Converter
-              </Link>
-            </li>
-            <li>
-              <Link href="/originality-checker" className="text-zinc-400 hover:text-white">
-                AI Originality Checker
-              </Link>
-            </li>
-            <li>
-              <Link href="/use-cases" className="text-zinc-400 hover:text-white">
-                Use Cases
-              </Link>
-            </li>
-            <li>
-              <Link href="/pricing" className="text-zinc-400 hover:text-white">
-                Pricing
-              </Link>
-            </li>
-            <li>
-              <Link href="/faq" className="text-zinc-400 hover:text-white">
-                FAQ
-              </Link>
-            </li>
-          </ul>
+          <p className="eyebrow-sm mb-4 text-ink-soft">Product</p>
+          <div className="flex flex-col gap-[11px]">
+            <Link href="/#converter" className="text-[15px] text-ink hover:text-accent">
+              Converter
+            </Link>
+            <Link href="/originality-checker" className="text-[15px] text-ink hover:text-accent">
+              AI checker
+            </Link>
+            <Link href="/#pricing" className="text-[15px] text-ink hover:text-accent">
+              Pricing
+            </Link>
+            <Link href="/#faq" className="text-[15px] text-ink hover:text-accent">
+              FAQ
+            </Link>
+          </div>
         </div>
 
-        <div className="lg:col-span-2">
-          <p className="text-sm font-semibold text-white">Free tools</p>
-          <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-            {USE_CASES.map((useCase) => (
-              <li key={useCase.slug}>
-                <Link
-                  href={`/${useCase.slug}`}
-                  className="text-zinc-400 hover:text-white"
-                >
-                  {useCase.navLabel}
-                </Link>
-              </li>
+        <div>
+          <p className="eyebrow-sm mb-4 text-ink-soft">Free tools</p>
+          <div className="flex flex-col gap-[11px]">
+            {USE_CASES.slice(0, 6).map((useCase) => (
+              <Link
+                key={useCase.slug}
+                href={`/${useCase.slug}`}
+                className="text-[15px] text-ink hover:text-accent"
+              >
+                {useCase.navLabel}
+              </Link>
             ))}
-          </ul>
+            <Link href="/use-cases" className="text-[15px] text-ink-soft hover:text-ink">
+              All tools
+            </Link>
+          </div>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-zinc-500">
-        © {new Date().getFullYear()} Tone Converter. All rights reserved.
+      <div className="mx-auto max-w-[1160px] px-5 pb-10 text-[13px] leading-none text-ink-soft sm:px-8">
+        © {new Date().getFullYear()} Poise. Formerly Tone Converter.
       </div>
     </footer>
   );
